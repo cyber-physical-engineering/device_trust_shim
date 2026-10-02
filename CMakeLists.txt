@@ -1,60 +1,62 @@
 cmake_minimum_required(VERSION 3.15)
-project(DeviceTrustShim VERSION 1.0.0 LANGUAGES CXX)
+project(DeviceTrustShim VERSION 0.2.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Define the header-only library interface target
-add_library(dts::DeviceTrustShim INTERFACE)
-target_include_directories(dts::DeviceTrustShim INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
+# Header-only library. Link to dts::DeviceTrustShim from your own target.
+add_library(DeviceTrustShim INTERFACE)
+add_library(dts::DeviceTrustShim ALIAS DeviceTrustShim)
+target_include_directories(DeviceTrustShim INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+target_compile_features(DeviceTrustShim INTERFACE cxx_std_17)
 
-# Installation of headers
-install(TARGETS dts::DeviceTrustShim EXPORT DeviceTrustShimTargets
-        DESTINATION include)
+# Build the examples and tests only when this is the top-level project,
+# not when another project pulls DTS in with add_subdirectory().
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    set(DTS_TOP_LEVEL ON)
+else()
+    set(DTS_TOP_LEVEL OFF)
+endif()
+option(DTS_BUILD_EXAMPLES "Build the DTS examples" ${DTS_TOP_LEVEL})
+option(DTS_BUILD_TESTS "Build the DTS unit tests" ${DTS_TOP_LEVEL})
 
-# Examples
-add_executable(radiology_example examples/radiology_device_example.cpp)
-target_link_libraries(radiology_example PRIVATE dts::DeviceTrustShim)
+if(DTS_BUILD_EXAMPLES)
+    foreach(example
+            radiology_device_example
+            infusion_pump_example
+            dicom_adapter_example
+            clinical_trial_adapter_example
+            industrial_adapter_example
+            building_automation_example)
+        add_executable(${example} examples/${example}.cpp)
+        target_link_libraries(${example} PRIVATE dts::DeviceTrustShim)
+    endforeach()
+endif()
 
-add_executable(infusion_pump_example examples/infusion_pump_example.cpp)
-target_link_libraries(infusion_pump_example PRIVATE dts::DeviceTrustShim)
+if(DTS_BUILD_TESTS)
+    enable_testing()
+    add_executable(test_audit_chain tests/test_audit_chain.cpp)
+    target_link_libraries(test_audit_chain PRIVATE dts::DeviceTrustShim)
+    add_test(NAME AuditChainTests COMMAND test_audit_chain)
+endif()
 
-add_executable(dicom_adapter_example examples/dicom_adapter_example.cpp)
-target_link_libraries(dicom_adapter_example PRIVATE dts::DeviceTrustShim)
-
-add_executable(clinical_trial_adapter_example examples/clinical_trial_adapter_example.cpp)
-target_link_libraries(clinical_trial_adapter_example PRIVATE dts::DeviceTrustShim)
-
-add_executable(industrial_adapter_example examples/industrial_adapter_example.cpp)
-target_link_libraries(industrial_adapter_example PRIVATE dts::DeviceTrustShim)
-
-add_executable(building_automation_example examples/building_automation_example.cpp)
-target_link_libraries(building_automation_example PRIVATE dts::DeviceTrustShim)
-
-# Tests
-add_executable(test_audit_chain tests/test_audit_chain.cpp)
-target_link_libraries(test_audit_chain PRIVATE dts::DeviceTrustShim)
-
-# Enable testing
-enable_testing()
-add_test(NAME AuditChainTests COMMAND test_audit_chain)
-
-# Install executables
-install(TARGETS radiology_example infusion_pump_example 
-              dicom_adapter_example clinical_trial_adapter_example
-              industrial_adapter_example building_automation_example
-              test_audit_chain
-        DESTINATION bin)
-
-# Package configuration
-set(ConfigPackageLocation lib/cmake/DeviceTrustShim)
-
+# Install the headers and a CMake package, so find_package(DeviceTrustShim)
+# gives other projects the dts::DeviceTrustShim target.
+include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+
+install(TARGETS DeviceTrustShim EXPORT DeviceTrustShimTargets)
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+set(ConfigPackageLocation ${CMAKE_INSTALL_LIBDIR}/cmake/DeviceTrustShim)
+
 write_basic_package_version_file(
     "${CMAKE_CURRENT_BINARY_DIR}/DeviceTrustShimConfigVersion.cmake"
     VERSION ${PROJECT_VERSION}
-    COMPATIBILITY AnyNewerVersion)
+    COMPATIBILITY SameMinorVersion)
 
 configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake/DeviceTrustShimConfig.cmake.in"
@@ -70,4 +72,3 @@ install(EXPORT DeviceTrustShimTargets
     FILE DeviceTrustShimTargets.cmake
     NAMESPACE dts::
     DESTINATION ${ConfigPackageLocation})
-

@@ -2,8 +2,8 @@
  * @file radiology_device_example.cpp
  * @brief Example: Tamper-evident audit logging for radiology device
  * 
- * Demonstrates DTS usage in a PACS integration scenario where
- * audit logs must be cryptographically verifiable for FDA compliance.
+ * Demonstrates DTS usage on a radiology device, where a reviewer needs
+ * to check that the device log was not altered.
  */
 
 #include <dts/audit_chain.hpp>

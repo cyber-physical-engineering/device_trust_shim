@@ -39,7 +39,7 @@ enum class DICOMEventType : uint8_t {
  * @brief DICOM-specific audit logger
  * 
  * Extends AuditChain with DICOM-aware event logging, automatically
- * extracting and logging relevant DICOM tags for compliance.
+ * extracting and logging relevant DICOM tags for audit.
  */
 class DICOMAdapter {
 public:
@@ -72,7 +72,7 @@ public:
     }
     
     /**
-     * @brief Log AI inference request (critical for FDA compliance)
+     * @brief Log an AI inference request
      * @param study_instance_uid Study being analyzed
      * @param model_name AI model identifier
      * @param model_version Model version
@@ -153,7 +153,7 @@ public:
     }
     
     /**
-     * @brief Log access control event (for HIPAA audit requirements)
+     * @brief Log an access control event
      * @param study_instance_uid Study accessed
      * @param user_id User attempting access
      * @param granted Whether access was granted
