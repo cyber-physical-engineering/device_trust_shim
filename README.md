@@ -5,6 +5,8 @@ A header-only C++17 library for tamper-evident device logs. Each log entry is on
 **Status: prototype.** 53 checks pass with Apple clang 21 on macOS (October 2026). The CMake build, install and a `find_package` consumer were verified the same day.
 CI builds and tests on Ubuntu (GCC and Clang), macOS (Clang) and Windows (MSVC) on every push.
 
+[![CI](https://github.com/cyber-physical-engineering/device_trust_shim/actions/workflows/ci.yml/badge.svg)](https://github.com/cyber-physical-engineering/device_trust_shim/actions/workflows/ci.yml)
+
 James Thornton set the architecture and requirements. The code was written with AI-assisted development in late 2025. The tests and checks were re-run in October 2026.
 
 ## What it does
