@@ -1,62 +1,28 @@
-# Contributing to Device Trust Shim
+# Contributing
 
-Thank you for your interest in contributing to Device Trust Shim (DTS)!
+This is a prototype. Issues and pull requests are welcome. There is no release schedule and no promised response time.
 
-## Development Setup
-
-### Prerequisites
-
-- C++17 compatible compiler (GCC 7+, Clang 5+, MSVC 2017+)
-- CMake 3.15 or later
-- Git
-
-### Building from Source
+## Build and test
 
 ```bash
-git clone https://github.com/BigDataPlumbing/device_trust_shim.git
+git clone https://github.com/cyber-physical-engineering/device_trust_shim.git
 cd device_trust_shim
-mkdir build && cd build
-cmake ..
-make
+cmake -B build -S .
+cmake --build build
+ctest --test-dir build --output-on-failure
 ```
 
-### Running Tests
+The tests are plain C++17 with no framework. `tests/test_audit_chain.cpp` counts failures with a `CHECK` macro that stays active in every build type.
 
-```bash
-cd build
-ctest --output-on-failure
-```
+## Before you open a pull request
 
-## Code Style
+1. Run the tests. A change to the entry format or the hashing must come with a test that fails without it.
+2. Keep the change small and say what it fixes.
+3. Build with `-Wall -Wextra -Wpedantic` and keep it warning-free.
+4. If the change removes a limit listed in the README, update that section.
 
-- Follow C++17 best practices
-- Use meaningful variable and function names
-- Add comments for non-obvious logic
-- Keep functions focused and small
-- Prefer `const` where possible
+## Ideas that fit
 
-## Submission Process
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Add tests for new functionality
-5. Ensure all tests pass (`ctest`)
-6. Commit your changes (`git commit -m 'Add amazing feature'`)
-7. Push to the branch (`git push origin feature/amazing-feature`)
-8. Open a Pull Request
-
-## Areas for Contribution
-
-- **Performance Optimization**: Reduce memory footprint or CPU usage
-- **Additional Hash Algorithms**: Support for SHA-3, BLAKE3, etc.
-- **Log Compression**: Add compression support for storage efficiency
-- **Multi-threading**: Thread-safe logging for multi-core devices
-- **Hardware Integration**: HSM-backed key storage support
-- **Documentation**: Improve examples, add integration guides
-- **Testing**: Expand test coverage, add fuzzing
-
-## Questions?
-
-Open an issue on GitHub or contact [Big Data Plumbing](https://www.bigdataplumbing.com).
-
+- A signature or an outside anchor for the chain, so a full rewrite is caught.
+- A pseudonym function for the clinical-trial adapter that uses a secret salt.
+- Fuzzing of the entry parser.

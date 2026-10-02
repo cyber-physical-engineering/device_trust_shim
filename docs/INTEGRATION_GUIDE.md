@@ -7,7 +7,7 @@ This guide walks through integrating Device Trust Shim (DTS) into your medical d
 Copy `include/dts/audit_chain.hpp` into your project's include directory, or add the DTS repository as a submodule:
 
 ```bash
-git submodule add https://github.com/BigDataPlumbing/device_trust_shim.git third_party/dts
+git submodule add https://github.com/cyber-physical-engineering/device_trust_shim.git third_party/dts
 ```
 
 Then include in your code:
@@ -80,6 +80,14 @@ std::vector<std::string> log_entries = load_logs_from_storage();
 if (!dts::AuditChain::verify_chain(log_entries)) {
     // Tampering detected - logs have been modified or deleted
     handle_security_incident();
+}
+```
+
+`verify_chain()` does not catch entries removed from the end of the log. If the device reports `get_chain_hash()` to a server after each batch, verify against that saved value instead:
+
+```cpp
+if (!dts::AuditChain::verify_chain_to_anchor(log_entries, saved_chain_hash)) {
+    // The log was changed, or its newest entries are missing
 }
 ```
 
@@ -174,25 +182,15 @@ For devices with limited storage, implement a circular buffer with chain preserv
 // This allows verification of the preserved chain segment
 ```
 
-## Compliance Integration
+## Inside a quality system
 
-### FDA 21 CFR Part 820
+DTS gives you one thing: a log a reviewer can check for changes. What the log must hold, how long it is kept, and who reviews it are decisions your quality system makes. Nothing in DTS satisfies a regulation by itself.
 
-- Log all device events affecting patient safety
-- Maintain logs for device lifetime + retention period
-- Provide logs during FDA inspections
+Three habits make the log useful during a review:
 
-### IEC 62304
-
-- Document software lifecycle events
-- Log software changes and version updates
-- Maintain traceability between requirements and implementation
-
-### Post-Market Surveillance
-
-- Upload logs to cloud gateway for analysis
-- Enable remote verification of device integrity
-- Support incident investigation and root cause analysis
+- Log the events a reviewer will ask about: version changes, calibration, alarms, operator actions.
+- Save `get_chain_hash()` somewhere the device cannot reach, so missing entries are caught.
+- Keep the entries exactly as `log()` wrote them. Reformatting breaks verification.
 
 ## Performance Optimization
 
@@ -233,5 +231,4 @@ bool valid = dts::AuditChain::verify_chain(all_entries);
 
 - Review [examples/](examples/) for complete integration patterns
 - See [README.md](../README.md) for API reference
-- Check [opensource_truststack](https://github.com/BigDataPlumbing/opensource_truststack) for cloud integration
 
