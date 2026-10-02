@@ -2,8 +2,8 @@
  * @file clinical_trial_adapter.hpp
  * @brief Clinical trial data collection audit logging adapter
  * 
- * Provides structured logging for clinical trial devices with automatic
- * patient ID anonymization, protocol compliance tracking, and GxP audit requirements.
+ * Provides structured logging for clinical trial devices. The raw patient ID
+ * never enters the log; a short SHA-256 pseudonym stands in for it.
  * 
  * @copyright Copyright (c) 2025 Big Data Plumbing
  * @license MIT License
@@ -39,12 +39,12 @@ enum class TrialEventType : uint8_t {
  * @brief Clinical trial audit logger
  * 
  * Extends AuditChain with clinical trial-specific logging, including
- * automatic patient ID anonymization and protocol compliance tracking.
+ * a patient ID pseudonym in place of the raw ID, and protocol deviation logging.
  */
 class ClinicalTrialAdapter {
 public:
     /**
-     * @brief Anonymization function type
+     * @brief Pseudonym function: maps a raw patient ID to the string that is logged
      * Default: SHA-256 hash of patient ID (one-way, deterministic)
      */
     using AnonymizerFunc = std::function<std::string(const std::string&)>;
@@ -71,7 +71,7 @@ public:
     
     /**
      * @brief Log patient enrollment event
-     * @param patient_id Patient identifier (will be anonymized in log)
+     * @param patient_id Patient identifier (replaced by its pseudonym in the log)
      * @param site_id Clinical site identifier
      * @param enrollment_date Enrollment date/time
      */
@@ -98,7 +98,7 @@ public:
     /**
      * @brief Log visit event (start/completion)
      * @param event_type VisitStarted or VisitCompleted
-     * @param patient_id Patient identifier (anonymized)
+     * @param patient_id Patient identifier (replaced by its pseudonym in the log)
      * @param visit_number Visit number
      * @param visit_type Visit type (e.g., "Screening", "Baseline", "Follow-up")
      */
@@ -123,7 +123,7 @@ public:
     
     /**
      * @brief Log data collection event
-     * @param patient_id Patient identifier (anonymized)
+     * @param patient_id Patient identifier (replaced by its pseudonym in the log)
      * @param data_type Type of data collected (e.g., "Vital Signs", "Lab Results")
      * @param form_id Case Report Form (CRF) identifier
      * @param data_point_count Number of data points collected
@@ -150,8 +150,8 @@ public:
     }
     
     /**
-     * @brief Log protocol deviation (critical for GxP compliance)
-     * @param patient_id Patient identifier (anonymized)
+     * @brief Log a protocol deviation
+     * @param patient_id Patient identifier (replaced by its pseudonym in the log)
      * @param deviation_type Type of deviation
      * @param description Deviation description
      * @param severity Deviation severity
@@ -177,7 +177,7 @@ public:
     
     /**
      * @brief Log adverse event (SAE reporting requirement)
-     * @param patient_id Patient identifier (anonymized)
+     * @param patient_id Patient identifier (replaced by its pseudonym in the log)
      * @param ae_type Adverse event type
      * @param severity AE severity (mild/moderate/severe)
      * @param relatedness Whether AE is related to investigational product
@@ -203,7 +203,7 @@ public:
      * @param export_type Type of export (e.g., "CRF", "Lab Data", "Imaging")
      * @param destination Export destination
      * @param record_count Number of records exported
-     * @param anonymized Whether data was anonymized before export
+     * @param anonymized Whether identifiers were removed before export
      */
     std::string log_data_export(const std::string& export_type,
                                const std::string& destination,

@@ -1,6 +1,6 @@
 /**
  * @file medtech_adapter.hpp
- * @brief MedTech device audit logging adapter (IEC 60601-1-8 compliant)
+ * @brief Audit logging adapter for infusion pumps, ventilators and similar devices
  * 
  * Provides structured logging for infusion pumps, ventilators, and other
  * safety-critical medical devices with alarm and safety event tracking.
@@ -126,7 +126,7 @@ public:
     }
     
     /**
-     * @brief Log safety alarm (IEC 60601-1-8)
+     * @brief Log a safety alarm with its priority (the IEC 60601-1-8 priority terms)
      * @param alarm_type Alarm type identifier
      * @param priority Alarm priority level
      * @param description Alarm description

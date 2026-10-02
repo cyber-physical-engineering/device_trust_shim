@@ -2,8 +2,8 @@
  * @file clinical_trial_adapter_example.cpp
  * @brief Example: Clinical trial data collection audit logging
  * 
- * Demonstrates GxP-compliant audit logging for clinical trial devices
- * with automatic patient ID anonymization.
+ * Demonstrates audit logging for clinical trial devices. The raw patient ID
+ * is replaced by a pseudonym before it is logged.
  */
 
 #include <dts/adapters/clinical_trial_adapter.hpp>
@@ -20,7 +20,7 @@ int main() {
     
     // Patient enrollment
     std::cout << logger.log_patient_enrolled(
-        "PATIENT-12345",  // Will be anonymized to ANON-xxxx
+        "PATIENT-12345",  // logged as ANON- plus a 16-hex-character pseudonym
         "SITE-001",
         "2025-01-15T10:00:00Z"
     ) << "\n\n";
@@ -70,11 +70,11 @@ int main() {
         "CRF",
         "EDC-System-001",
         150,  // 150 records
-        true  // Anonymized
+        true  // identifiers removed before export
     ) << "\n\n";
     
     std::cout << "Chain Hash: " << logger.get_chain_hash() << "\n";
-    std::cout << "Note: Patient IDs are automatically anonymized in logs.\n";
+    std::cout << "Note: the log never carries the raw patient ID, only a pseudonym (ANON- plus 16 hex characters of its SHA-256).\n";
     
     return 0;
 }

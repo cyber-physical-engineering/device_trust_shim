@@ -6,7 +6,7 @@
  * PLC events, SCADA alarms, production batch tracking, and protocol events
  * (Modbus, OPC UA, EtherNet/IP, etc.).
  * 
- * Designed for CMMC, NIST 800-82, and ISA/IEC 62443 compliance.
+ * The adapter formats messages. It does not talk to any controller or protocol itself.
  * 
  * @copyright Copyright (c) 2025 Big Data Plumbing
  * @license MIT License

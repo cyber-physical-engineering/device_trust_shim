@@ -2,8 +2,8 @@
  * @file infusion_pump_example.cpp
  * @brief Example: Safety-critical infusion pump audit logging
  * 
- * Demonstrates DTS usage for IEC 60601-1-8 compliant medical devices
- * where audit integrity is required for post-market surveillance.
+ * Demonstrates DTS usage on an infusion pump, where a service tool needs
+ * to check that the device log was not altered.
  */
 
 #include <dts/audit_chain.hpp>

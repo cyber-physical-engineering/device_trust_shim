@@ -3,7 +3,7 @@
  * @brief Example: DICOM audit logging for PACS integration
  * 
  * Demonstrates DICOM-specific audit logging for radiology devices,
- * including AI inference tracking required for FDA compliance.
+ * including AI inference request and completion events.
  */
 
 #include <dts/adapters/dicom_adapter.hpp>
@@ -29,7 +29,7 @@ int main() {
         "1.2.840.10008.5.1.4.1.1.4"  // MR Image Storage
     ) << "\n\n";
     
-    // AI inference request (critical for FDA compliance)
+    // AI inference request
     std::cout << logger.log_ai_inference_request(
         "1.2.840.113619.2.55.3.1234567890.1234567890123456",
         "radiology-detection-v2",
